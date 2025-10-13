@@ -1,0 +1,82 @@
+=====================================
+PUSHUP COUNTER - QUICK START GUIDE
+=====================================
+
+Follow these steps to get your pushup counter app running:
+
+STEP 1: Activate Virtual Environment
+-------------------------------------
+macOS/Linux:
+  cd /Users/asavoiu/Workspace/Dev_Projects/fitCounter
+  source venv/bin/activate
+
+Windows:
+  cd /Users/asavoiu/Workspace/Dev_Projects/fitCounter
+  venv\Scripts\activate
+
+
+STEP 2: Install Dependencies
+-----------------------------
+  pip install -r requirements.txt
+
+
+STEP 3: Create Database Tables
+-------------------------------
+  python manage.py makemigrations
+  python manage.py migrate
+
+
+STEP 4: Create Admin User
+--------------------------
+  python manage.py createsuperuser
+
+  You'll be asked to enter:
+  - Username (e.g., admin)
+  - Email (optional)
+  - Password (min 8 characters)
+
+
+STEP 5: Run the Server
+-----------------------
+  python manage.py runserver
+
+
+STEP 6: Access the App
+-----------------------
+  Open your browser and go to:
+  
+  Main App:    http://127.0.0.1:8000/
+  Admin Panel: http://127.0.0.1:8000/admin/
+
+
+USAGE TIPS:
+===========
+
+For Regular Users:
+- Sign up from the homepage
+- Add pushups for TODAY only
+- View leaderboard and your stats
+- Track your progress
+
+For Admin Users:
+- Login with your superuser credentials
+- Access admin panel at /admin/
+- Can add entries for ANY date
+- Manage all users and entries
+
+
+CONTEST RULES:
+==============
+✓ Only today's date can be logged by regular users
+✓ Multiple entries per day allowed
+✓ Monthly leaderboard rankings
+✓ Admins can import historical data
+
+
+Need Help?
+==========
+Check the README.md file for detailed documentation.
+
+
+Happy Pushing! 💪
+

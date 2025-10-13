@@ -1,0 +1,43 @@
+{% extends 'tracker/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - Pushup Counter{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h2 class="mb-4">
+                <i class="bi bi-plus-circle"></i> {{ title }}
+            </h2>
+            
+            {% if is_admin %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-shield-check"></i> <strong>Admin Mode</strong><br>
+                    <small>As an admin, you can add entries for any date.</small>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> <strong>Note</strong><br>
+                    <small>You can only add pushups for today's date.</small>
+                </div>
+            {% endif %}
+            
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                
+                <div class="d-grid gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-check-circle"></i> Save Entry
+                    </button>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

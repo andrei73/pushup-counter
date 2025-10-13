@@ -1,0 +1,94 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}Leaderboard - Pushup Counter{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="text-white">
+            <i class="bi bi-trophy"></i> Leaderboard
+        </h1>
+        <p class="text-white-50">Competition standings for {{ current_month }}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card p-4">
+            {% if leaderboard %}
+                <div class="leaderboard-container">
+                    {% for entry in leaderboard %}
+                        <div class="leaderboard-item {% if entry.user__id == current_user_id %}border border-primary border-3{% endif %}">
+                            <div class="leaderboard-rank {% if forloop.counter <= 3 %}rank-{{ forloop.counter }}{% endif %}">
+                                {% if forloop.counter == 1 %}
+                                    <i class="bi bi-trophy-fill"></i>
+                                {% elif forloop.counter == 2 %}
+                                    <i class="bi bi-trophy"></i>
+                                {% elif forloop.counter == 3 %}
+                                    <i class="bi bi-trophy"></i>
+                                {% else %}
+                                    #{{ forloop.counter }}
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-0">
+                                            {% if entry.user__first_name %}
+                                                {{ entry.user__first_name }} {{ entry.user__last_name }}
+                                            {% else %}
+                                                {{ entry.user__username }}
+                                            {% endif %}
+                                            {% if entry.user__id == current_user_id %}
+                                                <span class="badge bg-primary">You</span>
+                                            {% endif %}
+                                        </h5>
+                                        <small class="text-muted">@{{ entry.user__username }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <h3 class="mb-0 text-primary">{{ entry.total_pushups }}</h3>
+                                        <small class="text-muted">pushups</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox display-1 text-muted"></i>
+                    <p class="text-muted mt-3">No entries yet for this month. Be the first to log pushups!</p>
+                    <a href="{% url 'add_entry' %}" class="btn btn-primary mt-2">
+                        <i class="bi bi-plus-circle"></i> Add Pushups
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if leaderboard and leaderboard.count > 3 %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card p-4">
+            <h5><i class="bi bi-bar-chart"></i> Competition Stats</h5>
+            <div class="row mt-3">
+                <div class="col-md-4 text-center">
+                    <h2 class="text-primary">{{ leaderboard.count }}</h2>
+                    <p class="text-muted">Total Competitors</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <h2 class="text-success">{{ leaderboard.0.total_pushups }}</h2>
+                    <p class="text-muted">Leader's Total</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <h2 class="text-warning">{{ leaderboard|length }}</h2>
+                    <p class="text-muted">Active Users</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
