@@ -40,9 +40,16 @@ def dashboard(request):
     now = timezone.now()
     current_year = now.year
     current_month = now.month
+    today = now.date()
     
     # Get user's monthly stats
     stats = PushupEntry.get_user_stats(request.user, current_year, current_month)
+    
+    # Get today's pushup count
+    today_total = PushupEntry.objects.filter(
+        user=request.user,
+        date=today
+    ).aggregate(total=Sum('count'))['total'] or 0
     
     # Get user's recent entries
     recent_entries = PushupEntry.objects.filter(user=request.user)[:10]
@@ -57,6 +64,7 @@ def dashboard(request):
     
     context = {
         'stats': stats,
+        'today_total': today_total,
         'recent_entries': recent_entries,
         'user_rank': user_rank,
         'total_competitors': leaderboard.count(),
