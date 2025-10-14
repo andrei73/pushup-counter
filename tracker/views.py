@@ -51,6 +51,27 @@ def dashboard(request):
         date=today
     ).aggregate(total=Sum('count'))['total'] or 0
     
+    # Get daily pushup data for chart
+    from calendar import monthrange
+    from datetime import date
+    
+    # Get number of days in current month
+    days_in_month = monthrange(current_year, current_month)[1]
+    
+    # Get all entries for current month grouped by day
+    daily_data = PushupEntry.objects.filter(
+        user=request.user,
+        date__year=current_year,
+        date__month=current_month
+    ).values('date').annotate(total=Sum('count')).order_by('date')
+    
+    # Create a dictionary for easy lookup
+    daily_dict = {entry['date'].day: entry['total'] for entry in daily_data}
+    
+    # Create lists for chart (all days of month)
+    chart_labels = list(range(1, days_in_month + 1))
+    chart_data = [daily_dict.get(day, 0) for day in chart_labels]
+    
     # Get user's recent entries
     recent_entries = PushupEntry.objects.filter(user=request.user)[:10]
     
@@ -69,6 +90,8 @@ def dashboard(request):
         'user_rank': user_rank,
         'total_competitors': leaderboard.count(),
         'current_month': now.strftime('%B %Y'),
+        'chart_labels': chart_labels,
+        'chart_data': chart_data,
     }
     
     return render(request, 'tracker/dashboard.html', context)
