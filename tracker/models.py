@@ -54,7 +54,7 @@ class PushupEntry(models.Model):
     @staticmethod
     def get_user_stats(user, year, month):
         """Get statistics for a user in a specific month."""
-        from django.db.models import Sum, Avg, Max
+        from django.db.models import Sum, Max
         
         entries = PushupEntry.objects.filter(
             user=user,
@@ -62,16 +62,23 @@ class PushupEntry(models.Model):
             date__month=month
         )
         
-        stats = entries.aggregate(
-            total=Sum('count'),
-            average=Avg('count'),
-            best_day=Max('count')
-        )
+        # Get daily totals (sum multiple entries per day)
+        daily_totals = entries.values('date').annotate(
+            day_total=Sum('count')
+        ).values_list('day_total', flat=True)
         
-        stats['total'] = stats['total'] or 0
-        stats['average'] = round(stats['average'], 1) if stats['average'] else 0
-        stats['best_day'] = stats['best_day'] or 0
-        stats['days_active'] = entries.values('date').distinct().count()
+        # Calculate stats
+        total = sum(daily_totals) if daily_totals else 0
+        days_active = len(daily_totals)
+        best_day = max(daily_totals) if daily_totals else 0
+        average = round(total / days_active, 1) if days_active > 0 else 0
+        
+        stats = {
+            'total': total,
+            'average': average,
+            'best_day': best_day,
+            'days_active': days_active
+        }
         
         return stats
 
