@@ -208,6 +208,7 @@ def history(request):
 def profile(request, username=None):
     """View a user's profile and stats."""
     from django.contrib.auth.models import User
+    from calendar import monthrange
     
     if username:
         profile_user = get_object_or_404(User, username=username)
@@ -221,9 +222,27 @@ def profile(request, username=None):
     # Get user's stats
     stats = PushupEntry.get_user_stats(profile_user, current_year, current_month)
     
+    # Get daily pushup data for chart
+    days_in_month = monthrange(current_year, current_month)[1]
+    
+    # Get all entries for current month grouped by day
+    daily_data = PushupEntry.objects.filter(
+        user=profile_user,
+        date__year=current_year,
+        date__month=current_month
+    ).values('date').annotate(total=Sum('count')).order_by('date')
+    
+    # Create a dictionary for easy lookup
+    daily_dict = {entry['date'].day: entry['total'] for entry in daily_data}
+    
+    # Create lists for chart (all days of month)
+    chart_labels = list(range(1, days_in_month + 1))
+    chart_data = [daily_dict.get(day, 0) for day in chart_labels]
+    
     # Get user's rank
     leaderboard = PushupEntry.get_monthly_leaderboard(current_year, current_month)
     user_rank = None
+    total_users = leaderboard.count()
     for idx, entry in enumerate(leaderboard, 1):
         if entry['user__id'] == profile_user.id:
             user_rank = idx
@@ -232,13 +251,29 @@ def profile(request, username=None):
     # Get recent entries
     recent_entries = PushupEntry.objects.filter(user=profile_user)[:10]
     
+    # Calculate comparison with current user (if viewing someone else's profile)
+    comparison = None
+    if profile_user != request.user:
+        current_user_stats = PushupEntry.get_user_stats(request.user, current_year, current_month)
+        difference = stats['total'] - current_user_stats['total']
+        comparison = {
+            'difference': abs(difference),
+            'ahead': difference > 0,
+            'behind': difference < 0,
+            'tied': difference == 0
+        }
+    
     context = {
         'profile_user': profile_user,
         'stats': stats,
         'user_rank': user_rank,
+        'total_users': total_users,
         'recent_entries': recent_entries,
         'current_month': now.strftime('%B %Y'),
         'is_own_profile': profile_user == request.user,
+        'chart_labels': chart_labels,
+        'chart_data': chart_data,
+        'comparison': comparison,
     }
     
     return render(request, 'tracker/profile.html', context)
