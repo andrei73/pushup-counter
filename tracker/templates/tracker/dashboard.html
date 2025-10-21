@@ -155,29 +155,69 @@
     </div>
     
     <div class="col-md-4">
-        <div class="card p-4">
+        <!-- Activity Feed -->
+        <div class="card p-4 mb-4">
             <h4 class="mb-4">
-                <i class="bi bi-info-circle"></i> Tips & Info
+                <i class="bi bi-activity"></i> Live Activity
             </h4>
-            <div class="mb-3">
-                <h6><i class="bi bi-lightbulb text-warning"></i> Pro Tip</h6>
-                <p class="small text-muted">Stay consistent! Try to log pushups every day to maintain your streak.</p>
+            <div class="activity-feed" style="max-height: 400px; overflow-y: auto;">
+                {% if activity_feed %}
+                    {% for entry in activity_feed %}
+                        <div class="activity-item mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="d-flex align-items-start">
+                                <div class="activity-icon me-2">
+                                    {% if entry.user == user %}
+                                        <i class="bi bi-person-fill text-primary"></i>
+                                    {% else %}
+                                        <i class="bi bi-person text-secondary"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="activity-content">
+                                        <strong>
+                                            {% if entry.user == user %}
+                                                You
+                                            {% else %}
+                                                {{ entry.user.username }}
+                                            {% endif %}
+                                        </strong>
+                                        logged
+                                        <span class="badge bg-primary">{{ entry.count }}</span>
+                                        pushups
+                                        {% if entry.date == today %}
+                                            <span class="badge bg-success">Today</span>
+                                        {% elif entry.date == yesterday %}
+                                            <span class="badge bg-secondary">Yesterday</span>
+                                        {% endif %}
+                                    </div>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock"></i>
+                                        {{ entry.created_at|timesince }} ago
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center py-3">
+                        <i class="bi bi-inbox"></i><br>
+                        No recent activity yet.
+                    </p>
+                {% endif %}
             </div>
-            <hr>
-            <div class="mb-3">
-                <h6><i class="bi bi-calendar-check text-success"></i> Days Active</h6>
-                <p class="mb-0">{{ stats.days_active }} days this month</p>
+        </div>
+        
+        <!-- Quick Info -->
+        <div class="card p-4">
+            <h6 class="mb-3"><i class="bi bi-info-circle"></i> Quick Stats</h6>
+            <div class="mb-2">
+                <i class="bi bi-calendar-check text-success"></i>
+                <strong>{{ stats.days_active }}</strong> days active this month
             </div>
-            <hr>
             {% if user.is_staff or user.is_superuser %}
-                <div class="alert alert-warning">
+                <div class="alert alert-warning mt-3 mb-0">
                     <i class="bi bi-shield-check"></i> <strong>Admin Mode</strong><br>
                     <small>You can add entries for any date.</small>
-                </div>
-            {% else %}
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle"></i> <strong>Note</strong><br>
-                    <small>You can only add pushups for today's date to keep the contest fair!</small>
                 </div>
             {% endif %}
         </div>
