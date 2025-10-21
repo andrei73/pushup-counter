@@ -83,6 +83,13 @@ def dashboard(request):
             user_rank = idx
             break
     
+    # Get recent activity feed (all users)
+    activity_feed = PushupEntry.objects.select_related('user').order_by('-created_at')[:15]
+    
+    # Calculate yesterday for activity feed
+    from datetime import timedelta
+    yesterday = today - timedelta(days=1)
+    
     context = {
         'stats': stats,
         'today_total': today_total,
@@ -92,6 +99,9 @@ def dashboard(request):
         'current_month': now.strftime('%B %Y'),
         'chart_labels': chart_labels,
         'chart_data': chart_data,
+        'activity_feed': activity_feed,
+        'today': today,
+        'yesterday': yesterday,
     }
     
     return render(request, 'tracker/dashboard.html', context)

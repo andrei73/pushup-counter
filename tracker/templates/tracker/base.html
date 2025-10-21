@@ -171,6 +171,50 @@
             overflow: hidden;
         }
         
+        /* Activity Feed Styles */
+        .activity-feed {
+            scrollbar-width: thin;
+            scrollbar-color: #667eea #f1f1f1;
+        }
+        
+        .activity-feed::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .activity-feed::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .activity-feed::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+        
+        .activity-feed::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+        
+        .activity-item {
+            transition: all 0.2s ease;
+            padding: 8px;
+            border-radius: 8px;
+        }
+        
+        .activity-item:hover {
+            background: #f8f9fa;
+            transform: translateX(3px);
+        }
+        
+        .activity-icon {
+            font-size: 1.2rem;
+        }
+        
+        .activity-content {
+            line-height: 1.5;
+            margin-bottom: 4px;
+        }
+        
         .hero-section {
             text-align: center;
             color: white;
