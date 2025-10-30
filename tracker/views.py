@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Sum
 from datetime import datetime
-from .models import PushupEntry
+from .models import PushupEntry, Competition
 from .forms import SignUpForm, PushupEntryForm
 
 
@@ -90,6 +90,15 @@ def dashboard(request):
     from datetime import timedelta
     yesterday = today - timedelta(days=1)
     
+    # Get current competition
+    current_competition = Competition.get_current_competition()
+    
+    # Get last completed competition (for winner announcement)
+    last_competition = Competition.get_last_completed_competition()
+    
+    # Get user's win count (for badges)
+    win_count = Competition.objects.filter(winner=request.user, status=Competition.COMPLETED).count()
+    
     context = {
         'stats': stats,
         'today_total': today_total,
@@ -102,6 +111,9 @@ def dashboard(request):
         'activity_feed': activity_feed,
         'today': today,
         'yesterday': yesterday,
+        'current_competition': current_competition,
+        'last_competition': last_competition,
+        'win_count': win_count,
     }
     
     return render(request, 'tracker/dashboard.html', context)
@@ -117,10 +129,24 @@ def leaderboard(request):
     # Get monthly leaderboard
     leaderboard_data = PushupEntry.get_monthly_leaderboard(current_year, current_month)
     
+    # Add win count to each leaderboard entry
+    from django.contrib.auth.models import User
+    leaderboard_with_wins = []
+    for entry in leaderboard_data:
+        user = User.objects.get(id=entry['user__id'])
+        win_count = Competition.objects.filter(winner=user, status=Competition.COMPLETED).count()
+        entry_dict = dict(entry)
+        entry_dict['win_count'] = win_count
+        leaderboard_with_wins.append(entry_dict)
+    
+    # Get current competition
+    current_competition = Competition.get_current_competition()
+    
     context = {
-        'leaderboard': leaderboard_data,
+        'leaderboard': leaderboard_with_wins,
         'current_month': now.strftime('%B %Y'),
         'current_user_id': request.user.id,
+        'current_competition': current_competition,
     }
     
     return render(request, 'tracker/leaderboard.html', context)
@@ -273,6 +299,9 @@ def profile(request, username=None):
             'tied': difference == 0
         }
     
+    # Get user's win count (for badges)
+    win_count = Competition.objects.filter(winner=profile_user, status=Competition.COMPLETED).count()
+    
     context = {
         'profile_user': profile_user,
         'stats': stats,
@@ -284,7 +313,56 @@ def profile(request, username=None):
         'chart_labels': chart_labels,
         'chart_data': chart_data,
         'comparison': comparison,
+        'win_count': win_count,
     }
     
     return render(request, 'tracker/profile.html', context)
+
+
+@login_required
+def competitions(request):
+    """View all competitions (past and current)."""
+    # Get all competitions ordered by most recent first
+    all_competitions = Competition.objects.all()
+    
+    # Separate current, upcoming, and completed competitions
+    current_comp = Competition.get_current_competition()
+    completed_comps = Competition.objects.filter(status=Competition.COMPLETED)
+    upcoming_comps = Competition.objects.filter(status=Competition.UPCOMING)
+    
+    context = {
+        'current_competition': current_comp,
+        'completed_competitions': completed_comps,
+        'upcoming_competitions': upcoming_comps,
+        'all_competitions': all_competitions,
+    }
+    
+    return render(request, 'tracker/competitions.html', context)
+
+
+@login_required
+def competition_detail(request, competition_id):
+    """View details of a specific competition."""
+    competition = get_object_or_404(Competition, id=competition_id)
+    
+    # Get leaderboard for this competition
+    leaderboard_data = PushupEntry.get_monthly_leaderboard(competition.year, competition.month)
+    
+    # Add win count to each leaderboard entry
+    from django.contrib.auth.models import User
+    leaderboard_with_wins = []
+    for entry in leaderboard_data:
+        user = User.objects.get(id=entry['user__id'])
+        win_count = Competition.objects.filter(winner=user, status=Competition.COMPLETED).count()
+        entry_dict = dict(entry)
+        entry_dict['win_count'] = win_count
+        leaderboard_with_wins.append(entry_dict)
+    
+    context = {
+        'competition': competition,
+        'leaderboard': leaderboard_with_wins,
+        'participant_count': len(leaderboard_with_wins),
+    }
+    
+    return render(request, 'tracker/competition_detail.html', context)
 

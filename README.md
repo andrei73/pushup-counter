@@ -5,13 +5,17 @@ A Django-based web application for tracking pushup competitions among friends. P
 ## Features
 
 - 🏋️ **Track Daily Pushups**: Log your pushup count every day with optional notes
-- 🏆 **Real-time Leaderboard**: See how you rank against your friends in monthly competitions
+- 🏆 **Monthly Competitions**: Structured competitions with automatic winner determination
+- 🥇 **Winner Recognition**: Champion badges and historical winner tracking
 - 📊 **Personal Statistics**: Track your total, average, best day, and active days
-- 👥 **Public Registration**: Anyone can create an account and join the competition
+- 📈 **Daily Progress Charts**: Visual bar charts showing your pushup trends
+- 👥 **User Profiles**: Detailed stats, charts, and competition history for each user
+- 🎯 **Competition Archive**: Browse past, current, and upcoming competitions
+- 📱 **Progressive Web App (PWA)**: Install on mobile and desktop, works offline
+- 🔔 **Live Activity Feed**: See real-time pushup entries from all competitors
 - 🔒 **Fair Play**: Regular users can only add today's pushups (prevents backdating)
 - 👑 **Admin Privileges**: Admins can add historical data for any date
 - 📱 **Responsive Design**: Beautiful, modern UI built with Bootstrap 5
-- 📈 **Charts & Visualizations**: Visual progress tracking (Chart.js ready)
 
 ## Technology Stack
 
@@ -159,6 +163,43 @@ fitCounter/
 - **User Stats**: Personal statistics and rankings
 - **Recent Activity**: Your last 10 entries
 - **Public Profiles**: View other users' profiles (without edit access)
+- **Winner Badges**: Champion badges displayed for competition winners
+
+### Monthly Competitions 🏆
+- **Structured Competitions**: Each month is a formal competition
+- **Automatic Winner Detection**: Winners determined at month end
+- **Competition Dashboard**: View active, past, and upcoming competitions
+- **Winner Recognition**: Champion badges and historical tracking
+- **Competition Archive**: Browse all competitions and their leaderboards
+
+## Managing Competitions
+
+### Creating Competitions
+
+Use the management command to create competitions:
+
+```bash
+# Create competition for current month
+python manage.py create_competitions
+
+# Create competition for specific month
+python manage.py create_competitions --year 2025 --month 11
+
+# Create next 3 months of competitions
+python manage.py create_competitions --months 3
+
+# Update status of all competitions
+python manage.py create_competitions --update-status
+```
+
+### Via Django Admin
+
+1. Go to `/admin/tracker/competition/`
+2. Click "Add Competition"
+3. Fill in the competition details
+4. Winners are automatically determined when status changes to "Completed"
+
+For detailed information about the competition feature, see [COMPETITION_FEATURE.md](COMPETITION_FEATURE.md).
 
 ## Advanced Configuration
 

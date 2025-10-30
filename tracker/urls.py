@@ -22,5 +22,9 @@ urlpatterns = [
     # Profile
     path('profile/', views.profile, name='profile'),
     path('profile/<str:username>/', views.profile, name='user_profile'),
+    
+    # Competitions
+    path('competitions/', views.competitions, name='competitions'),
+    path('competitions/<int:competition_id>/', views.competition_detail, name='competition_detail'),
 ]
 

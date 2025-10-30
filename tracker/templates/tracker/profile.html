@@ -41,9 +41,16 @@
             {% if profile_user.email and is_own_profile %}
                 <p class="text-muted"><i class="bi bi-envelope"></i> {{ profile_user.email }}</p>
             {% endif %}
-            {% if profile_user.is_staff or profile_user.is_superuser %}
-                <span class="badge bg-warning text-dark">Admin</span>
-            {% endif %}
+            <div class="mb-2">
+                {% if profile_user.is_staff or profile_user.is_superuser %}
+                    <span class="badge bg-warning text-dark">Admin</span>
+                {% endif %}
+                {% if win_count > 0 %}
+                    <span class="winner-badge winner-badge-large" title="{{ win_count }} time{{ win_count|pluralize }} champion">
+                        <i class="bi bi-trophy-fill"></i> {{ win_count }}x Champion
+                    </span>
+                {% endif %}
+            </div>
             <hr>
             <div class="mt-3">
                 <p class="mb-2"><strong>Rank</strong></p>

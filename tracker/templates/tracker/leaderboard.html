@@ -44,6 +44,11 @@
                                             {% if entry.user__id == current_user_id %}
                                                 <span class="badge bg-primary">You</span>
                                             {% endif %}
+                                            {% if entry.win_count > 0 %}
+                                                <span class="winner-badge" title="{{ entry.win_count }} time{{ entry.win_count|pluralize }} champion">
+                                                    <i class="bi bi-trophy-fill"></i> {{ entry.win_count }}x
+                                                </span>
+                                            {% endif %}
                                         </h5>
                                         <small class="text-muted">
                                             <a href="{% url 'user_profile' entry.user__username %}" class="text-muted text-decoration-none">

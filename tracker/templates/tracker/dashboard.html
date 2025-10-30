@@ -15,6 +15,79 @@
     </div>
 </div>
 
+<!-- Competition Banner -->
+{% if current_competition %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card p-4" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); border: none;">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h3 class="text-white mb-2">
+                        <i class="bi bi-trophy-fill"></i> {{ current_competition.name }} Competition
+                    </h3>
+                    <p class="text-white mb-1">
+                        <i class="bi bi-calendar-event"></i> 
+                        {{ current_competition.start_date|date:"M j" }} - {{ current_competition.end_date|date:"M j, Y" }}
+                    </p>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="badge bg-light text-dark px-3 py-2">
+                            <i class="bi bi-clock"></i> 
+                            {% if current_competition.days_remaining > 1 %}
+                                {{ current_competition.days_remaining }} days remaining
+                            {% elif current_competition.days_remaining == 1 %}
+                                Final day! 💪
+                            {% else %}
+                                Competition ended
+                            {% endif %}
+                        </span>
+                        {% if user_rank %}
+                        <span class="badge bg-white text-purple px-3 py-2">
+                            Your position: #{{ user_rank }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <a href="{% url 'competitions' %}" class="btn btn-light">
+                        <i class="bi bi-list-ul"></i> View All Competitions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Last Month's Winner -->
+{% if last_competition and last_competition.winner %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card p-3" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); border: none;">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h5 class="text-white mb-1">
+                        🏆 Last Month's Champion: 
+                        <a href="{% url 'user_profile' last_competition.winner.username %}" class="text-white" style="text-decoration: underline;">
+                            <strong>{{ last_competition.winner.username }}</strong>
+                        </a>
+                    </h5>
+                    <p class="text-white mb-0">
+                        <small>{{ last_competition.name }} - {{ last_competition.winner_total }} pushups</small>
+                    </p>
+                </div>
+                {% if last_competition.winner == user %}
+                <div>
+                    <span class="badge bg-light text-warning px-3 py-2">
+                        <i class="bi bi-trophy-fill"></i> You won!
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Stats Cards -->
 <div class="row mb-4">
     <div class="col-lg-2 col-md-4 col-sm-6 mb-3">

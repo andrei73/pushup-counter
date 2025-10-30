@@ -1,0 +1,145 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}{{ competition.name }} - Pushup Counter{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <h1 class="text-white mb-0">
+                <i class="bi bi-trophy-fill"></i> {{ competition.name }}
+            </h1>
+            <a href="{% url 'competitions' %}" class="btn btn-outline-light mt-2 mt-md-0">
+                <i class="bi bi-arrow-left"></i> Back to Competitions
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Competition Info -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card p-4">
+            <div class="row">
+                <div class="col-md-3 text-center mb-3 mb-md-0">
+                    <span class="competition-status-badge status-{{ competition.status }} mb-2">
+                        {% if competition.status == 'active' %}
+                            <i class="bi bi-play-circle-fill"></i> ACTIVE
+                        {% elif competition.status == 'completed' %}
+                            <i class="bi bi-flag-fill"></i> COMPLETED
+                        {% else %}
+                            <i class="bi bi-hourglass-split"></i> UPCOMING
+                        {% endif %}
+                    </span>
+                    <h5 class="mt-2">Status</h5>
+                </div>
+                <div class="col-md-3 text-center mb-3 mb-md-0">
+                    <h2 class="text-primary mb-0">{{ participant_count }}</h2>
+                    <p class="text-muted">Participant{{ participant_count|pluralize }}</p>
+                </div>
+                <div class="col-md-3 text-center mb-3 mb-md-0">
+                    <h5 class="mb-2">Dates</h5>
+                    <p class="mb-0">{{ competition.start_date|date:"M j" }} - {{ competition.end_date|date:"M j, Y" }}</p>
+                </div>
+                <div class="col-md-3 text-center">
+                    {% if competition.status == 'active' %}
+                        <h2 class="text-success mb-0">{{ competition.days_remaining }}</h2>
+                        <p class="text-muted">Day{{ competition.days_remaining|pluralize }} Remaining</p>
+                    {% elif competition.status == 'completed' %}
+                        <i class="bi bi-check-circle-fill text-success display-4"></i>
+                        <p class="text-muted mt-2">Finished</p>
+                    {% else %}
+                        <i class="bi bi-clock-history text-info display-4"></i>
+                        <p class="text-muted mt-2">Not Started</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Winner Banner -->
+{% if competition.status == 'completed' and competition.winner %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card p-4" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); border: none;">
+            <div class="text-center">
+                <i class="bi bi-trophy-fill text-white display-1"></i>
+                <h2 class="text-white mt-3">Champion</h2>
+                <h1 class="text-white mb-2">
+                    <a href="{% url 'user_profile' competition.winner.username %}" class="text-white" style="text-decoration: underline;">
+                        {{ competition.winner.username }}
+                    </a>
+                </h1>
+                <h3 class="text-white">{{ competition.winner_total }} pushups</h3>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Leaderboard -->
+<div class="row">
+    <div class="col-12">
+        <div class="card p-4">
+            <h4 class="mb-4">
+                <i class="bi bi-list-ol"></i> Final Standings
+            </h4>
+            {% if leaderboard %}
+                <div class="leaderboard-container">
+                    {% for entry in leaderboard %}
+                        <div class="leaderboard-item">
+                            <div class="leaderboard-rank {% if forloop.counter <= 3 %}rank-{{ forloop.counter }}{% endif %}">
+                                {% if forloop.counter == 1 %}
+                                    <i class="bi bi-trophy-fill"></i>
+                                {% elif forloop.counter == 2 %}
+                                    <i class="bi bi-trophy"></i>
+                                {% elif forloop.counter == 3 %}
+                                    <i class="bi bi-trophy"></i>
+                                {% else %}
+                                    #{{ forloop.counter }}
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-0">
+                                            <a href="{% url 'user_profile' entry.user__username %}" class="text-decoration-none text-dark" style="cursor: pointer;">
+                                                {% if entry.user__first_name %}
+                                                    {{ entry.user__first_name }} {{ entry.user__last_name }}
+                                                {% else %}
+                                                    {{ entry.user__username }}
+                                                {% endif %}
+                                            </a>
+                                            {% if entry.win_count > 0 %}
+                                                <span class="winner-badge" title="{{ entry.win_count }} time{{ entry.win_count|pluralize }} champion">
+                                                    <i class="bi bi-trophy-fill"></i> {{ entry.win_count }}x
+                                                </span>
+                                            {% endif %}
+                                        </h5>
+                                        <small class="text-muted">
+                                            <a href="{% url 'user_profile' entry.user__username %}" class="text-muted text-decoration-none">
+                                                @{{ entry.user__username }}
+                                            </a>
+                                        </small>
+                                    </div>
+                                    <div class="text-end">
+                                        <h3 class="mb-0 text-primary">{{ entry.total_pushups }}</h3>
+                                        <small class="text-muted">pushups</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox display-1 text-muted"></i>
+                    <p class="text-muted mt-3">No entries yet for this competition.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
