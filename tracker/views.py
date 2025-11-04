@@ -37,10 +37,10 @@ def signup(request):
 @login_required
 def dashboard(request):
     """User dashboard with personal stats."""
-    now = timezone.now()
-    current_year = now.year
-    current_month = now.month
-    today = now.date()
+    from datetime import date
+    today = date.today()  # Use local server date instead of UTC
+    current_year = today.year
+    current_month = today.month
     
     # Get user's monthly stats
     stats = PushupEntry.get_user_stats(request.user, current_year, current_month)
@@ -105,7 +105,7 @@ def dashboard(request):
         'recent_entries': recent_entries,
         'user_rank': user_rank,
         'total_competitors': leaderboard.count(),
-        'current_month': now.strftime('%B %Y'),
+        'current_month': today.strftime('%B %Y'),
         'chart_labels': chart_labels,
         'chart_data': chart_data,
         'activity_feed': activity_feed,
@@ -122,9 +122,10 @@ def dashboard(request):
 @login_required
 def leaderboard(request):
     """Leaderboard view showing all users' rankings."""
-    now = timezone.now()
-    current_year = now.year
-    current_month = now.month
+    from datetime import date
+    today = date.today()
+    current_year = today.year
+    current_month = today.month
     
     # Get monthly leaderboard
     leaderboard_data = PushupEntry.get_monthly_leaderboard(current_year, current_month)
@@ -144,7 +145,7 @@ def leaderboard(request):
     
     context = {
         'leaderboard': leaderboard_with_wins,
-        'current_month': now.strftime('%B %Y'),
+        'current_month': today.strftime('%B %Y'),
         'current_user_id': request.user.id,
         'current_competition': current_competition,
     }
@@ -251,9 +252,10 @@ def profile(request, username=None):
     else:
         profile_user = request.user
     
-    now = timezone.now()
-    current_year = now.year
-    current_month = now.month
+    from datetime import date
+    today = date.today()
+    current_year = today.year
+    current_month = today.month
     
     # Get user's stats
     stats = PushupEntry.get_user_stats(profile_user, current_year, current_month)
@@ -308,7 +310,7 @@ def profile(request, username=None):
         'user_rank': user_rank,
         'total_users': total_users,
         'recent_entries': recent_entries,
-        'current_month': now.strftime('%B %Y'),
+        'current_month': today.strftime('%B %Y'),
         'is_own_profile': profile_user == request.user,
         'chart_labels': chart_labels,
         'chart_data': chart_data,

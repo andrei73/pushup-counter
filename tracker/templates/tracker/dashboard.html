@@ -94,7 +94,7 @@
         <div class="stat-card" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
             <div class="stat-label">Today's Pushups</div>
             <div class="stat-value">{{ today_total }}</div>
-            <div><i class="bi bi-calendar-day"></i> Today</div>
+            <div><i class="bi bi-calendar-day"></i> {{ today|date:"D, M j" }}</div>
         </div>
     </div>
     <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
@@ -108,14 +108,14 @@
         <div class="stat-card green">
             <div class="stat-label">Daily Average</div>
             <div class="stat-value">{{ stats.average }}</div>
-            <div><i class="bi bi-calendar-check"></i> Per Day</div>
+            <div><i class="bi bi-calendar-check"></i> This Month</div>
         </div>
     </div>
     <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
         <div class="stat-card orange">
             <div class="stat-label">Best Day</div>
             <div class="stat-value">{{ stats.best_day }}</div>
-            <div><i class="bi bi-trophy"></i> Personal Best</div>
+            <div><i class="bi bi-trophy"></i> This Month</div>
         </div>
     </div>
     <div class="col-lg-2 col-md-4 col-sm-6 mb-3">

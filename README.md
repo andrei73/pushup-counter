@@ -15,6 +15,8 @@ A Django-based web application for tracking pushup competitions among friends. P
 - 🔔 **Live Activity Feed**: See real-time pushup entries from all competitors
 - 🔒 **Fair Play**: Regular users can only add today's pushups (prevents backdating)
 - 👑 **Admin Privileges**: Admins can add historical data for any date
+- 🔐 **Password Reset**: Email-based password recovery with secure tokens
+- 📧 **Email Integration**: Gmail SMTP for password resets and notifications
 - 📱 **Responsive Design**: Beautiful, modern UI built with Bootstrap 5
 
 ## Technology Stack

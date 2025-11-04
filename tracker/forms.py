@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.utils import timezone
+from datetime import date
 from .models import PushupEntry
 
 
@@ -32,27 +32,27 @@ class PushupEntryForm(forms.ModelForm):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         
-        # Set default date to today
+        # Set default date to today (local server date)
         if not self.instance.pk:
-            self.fields['date'].initial = timezone.now().date()
+            self.fields['date'].initial = date.today()
 
     def clean_date(self):
         """Validate that regular users can only enter today's date."""
-        date = self.cleaned_data.get('date')
-        today = timezone.now().date()
+        entry_date = self.cleaned_data.get('date')
+        today = date.today()  # Use local server date instead of UTC
         
         # Allow admins and staff to enter any date
         if self.user and (self.user.is_staff or self.user.is_superuser):
-            return date
+            return entry_date
         
         # Regular users can only enter today's date
-        if date != today:
+        if entry_date != today:
             raise forms.ValidationError(
                 f"You can only log pushups for today's date ({today}). "
                 "Please contact an admin if you need to add historical data."
             )
         
-        return date
+        return entry_date
 
     def clean_count(self):
         """Validate that count is positive."""
