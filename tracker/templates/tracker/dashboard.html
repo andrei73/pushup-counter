@@ -68,7 +68,7 @@
                     <h5 class="text-white mb-1">
                         🏆 Last Month's Champion: 
                         <a href="{% url 'user_profile' last_competition.winner.username %}" class="text-white" style="text-decoration: underline;">
-                            <strong>{{ last_competition.winner.username }}</strong>
+                            <strong>{% firstof last_competition.winner.get_full_name last_competition.winner.username %}</strong>
                         </a>
                     </h5>
                     <p class="text-white mb-0">
@@ -258,7 +258,7 @@
                                             {% if entry.user == user %}
                                                 You
                                             {% else %}
-                                                {{ entry.user.username }}
+                                                {% firstof entry.user.get_full_name entry.user.username %}
                                             {% endif %}
                                         </strong>
                                         logged

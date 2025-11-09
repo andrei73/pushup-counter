@@ -84,11 +84,11 @@
                     {% if competition.winner %}
                     <div class="alert alert-warning mb-3" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); border: none;">
                         <div class="d-flex align-items-center">
-                            <i class="bi bi-trophy-fill text-white me-2" style="font-size: 1.5rem;"></i>
-                            <div class="text-white">
-                                <strong>Champion: {{ competition.winner.username }}</strong><br>
-                                <small>{{ competition.winner_total }} pushups</small>
-                            </div>
+                        <i class="bi bi-trophy-fill text-white me-2" style="font-size: 1.5rem;"></i>
+                        <div class="text-white">
+                            <strong>Champion: {% firstof competition.winner.get_full_name competition.winner.username %}</strong><br>
+                            <small>{{ competition.winner_total }} pushups</small>
+                        </div>
                         </div>
                     </div>
                     {% endif %}

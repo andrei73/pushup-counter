@@ -65,12 +65,12 @@
         <div class="card p-4" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); border: none;">
             <div class="text-center">
                 <i class="bi bi-trophy-fill text-white display-1"></i>
-                <h2 class="text-white mt-3">Champion</h2>
-                <h1 class="text-white mb-2">
-                    <a href="{% url 'user_profile' competition.winner.username %}" class="text-white" style="text-decoration: underline;">
-                        {{ competition.winner.username }}
-                    </a>
-                </h1>
+            <h2 class="text-white mt-3">Champion</h2>
+            <h1 class="text-white mb-2">
+                <a href="{% url 'user_profile' competition.winner.username %}" class="text-white" style="text-decoration: underline;">
+                    {% firstof competition.winner.get_full_name competition.winner.username %}
+                </a>
+            </h1>
                 <h3 class="text-white">{{ competition.winner_total }} pushups</h3>
             </div>
         </div>
