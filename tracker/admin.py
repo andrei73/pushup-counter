@@ -31,7 +31,7 @@ class CompetitionAdmin(admin.ModelAdmin):
         }),
         ('Winner', {
             'fields': ('winner', 'winner_total'),
-            'description': 'Winner is automatically determined when competition ends'
+            'description': 'Winner is automatically determined when status is changed to "completed"'
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
@@ -40,6 +40,24 @@ class CompetitionAdmin(admin.ModelAdmin):
     )
     
     actions = ['update_status', 'determine_winners']
+    
+    def save_model(self, request, obj, form, change):
+        """Override save to automatically determine winner when status changes to completed."""
+        # Check if status changed to completed
+        if change:  # Only for existing objects
+            # Get the old object from database
+            old_obj = Competition.objects.get(pk=obj.pk)
+            # If status changed to completed and no winner set
+            if obj.status == Competition.COMPLETED and old_obj.status != Competition.COMPLETED:
+                # Save first to update the status
+                super().save_model(request, obj, form, change)
+                # Then determine winner
+                if not obj.winner:
+                    obj.determine_winner()
+                    self.message_user(request, f'Winner automatically determined: {obj.winner} with {obj.winner_total} pushups')
+                return
+        # Normal save for other cases
+        super().save_model(request, obj, form, change)
     
     def update_status(self, request, queryset):
         """Update status of selected competitions."""
@@ -52,9 +70,19 @@ class CompetitionAdmin(admin.ModelAdmin):
         """Determine winners for completed competitions."""
         count = 0
         for competition in queryset:
-            if competition.status == Competition.COMPLETED and not competition.winner:
-                competition.determine_winner()
-                count += 1
-        self.message_user(request, f'Determined winners for {count} competition(s)')
-    determine_winners.short_description = 'Determine winners'
+            if competition.status == Competition.COMPLETED:
+                if not competition.winner:
+                    competition.determine_winner()
+                    count += 1
+                    self.message_user(request, f'✅ Determined winner for {competition.name}: {competition.winner} ({competition.winner_total} pushups)', level='success')
+                else:
+                    self.message_user(request, f'ℹ️ {competition.name} already has a winner: {competition.winner}', level='info')
+            else:
+                self.message_user(request, f'⚠️ {competition.name} is not completed yet (status: {competition.status})', level='warning')
+        
+        if count > 0:
+            self.message_user(request, f'Successfully determined winners for {count} competition(s)')
+        else:
+            self.message_user(request, 'No competitions needed winner determination')
+    determine_winners.short_description = 'Determine winners for completed competitions'
 
