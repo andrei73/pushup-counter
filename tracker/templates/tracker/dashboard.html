@@ -127,10 +127,17 @@
             <div><i class="bi bi-people"></i> of {{ total_competitors }}</div>
         </div>
     </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="stat-card" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">
+            <div class="stat-label">Lifetime Total</div>
+            <div class="stat-value">{{ lifetime_total }}</div>
+            <div><i class="bi bi-infinity"></i> All Time</div>
+        </div>
+    </div>
 </div>
 
-<!-- Quick Actions -->
-<div class="row mb-4">
+<!-- Quick Actions (Desktop Only) -->
+<div class="row mb-4 quick-actions-desktop">
     <div class="col-12">
         <div class="card p-3">
             <div class="d-flex justify-content-between align-items-center">

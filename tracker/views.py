@@ -51,6 +51,11 @@ def dashboard(request):
         date=today
     ).aggregate(total=Sum('count'))['total'] or 0
     
+    # Get lifetime total (all time)
+    lifetime_total = PushupEntry.objects.filter(
+        user=request.user
+    ).aggregate(total=Sum('count'))['total'] or 0
+    
     # Get daily pushup data for chart
     from calendar import monthrange
     from datetime import date
@@ -102,6 +107,7 @@ def dashboard(request):
     context = {
         'stats': stats,
         'today_total': today_total,
+        'lifetime_total': lifetime_total,
         'recent_entries': recent_entries,
         'user_rank': user_rank,
         'total_competitors': leaderboard.count(),
@@ -217,6 +223,8 @@ def delete_entry(request, pk):
 @login_required
 def history(request):
     """View all entries with filtering options."""
+    from django.db.models import Sum
+    
     entries = PushupEntry.objects.filter(user=request.user)
     
     # Get filter parameters
@@ -228,6 +236,9 @@ def history(request):
     if month:
         entries = entries.filter(date__month=month)
     
+    # Calculate total pushups for filtered entries
+    total_pushups = entries.aggregate(total=Sum('count'))['total'] or 0
+    
     # Get available years for filter dropdown
     years = PushupEntry.objects.filter(user=request.user).dates('date', 'year', order='DESC')
     
@@ -236,6 +247,7 @@ def history(request):
         'years': years,
         'selected_year': year,
         'selected_month': month,
+        'total_pushups': total_pushups,
     }
     
     return render(request, 'tracker/history.html', context)
